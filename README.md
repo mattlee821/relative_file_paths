@@ -1,5 +1,5 @@
 
-# How I use Git with my projects
+# How I use relative file paths with my projects
 
 This README details how to use variables in `R` and `bash` so that you
 can use relative file paths i.e. `relative/file/path` as opposed to
