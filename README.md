@@ -1,5 +1,5 @@
 
-# How I use Git with my projects
+# Using relative file paths and Git
 
 This README details how to use variables in `R` and `bash` so that you
 can use relative file paths i.e. `relative/file/path` as opposed to
@@ -7,25 +7,33 @@ can use relative file paths i.e. `relative/file/path` as opposed to
 be more reproducible by others as they will be using the same file paths
 as you.
 
-## Making a project directory
+## First: Make a `GitHub` repository
+
+Make a `GitHub` repository. Here the name of our `GitHub` repository is
+`relative_file_paths`. It doesn’t matter if the repo is public or
+private.
+
+![](./docs/github_screenshot.png)
+
+## Second: Making a project directory
 
 All of my projects use the same starting structure (here our project is
-caled `project_1`):
+caled `relative_file_paths`):
 
-    ##                 levelName
-    ## 1  project_1/            
-    ## 2   ¦--docs/             
-    ## 3   ¦--manuscript/       
-    ## 4   ¦--data/             
-    ## 5   ¦--analysis/         
-    ## 6   ¦--scripts/          
-    ## 7   ¦--environment/      
-    ## 8   ¦   °--environment.sh
-    ## 9   ¦--.Renvironment     
-    ## 10  ¦--.Rproj.user       
-    ## 11  ¦--project_1.Rproj   
-    ## 12  ¦--.git/             
-    ## 13  ¦--.gitignore        
+    ##                        levelName
+    ## 1  relative_file_paths/         
+    ## 2   ¦--docs/                    
+    ## 3   ¦--manuscript/              
+    ## 4   ¦--data/                    
+    ## 5   ¦--analysis/                
+    ## 6   ¦--scripts/                 
+    ## 7   ¦--environment/             
+    ## 8   ¦   °--environment.sh       
+    ## 9   ¦--.Renvironment            
+    ## 10  ¦--.Rproj.user              
+    ## 11  ¦--relative_file_paths.Rproj
+    ## 12  ¦--.git/                    
+    ## 13  ¦--.gitignore               
     ## 14  °--README.Rmd
 
 To make this structure I use a standard script which first creates the
@@ -41,15 +49,18 @@ initializes the git repository.
 <p>
 
 ``` r
-cd "path/to//001_projects"
+#!/bin/bash
+cd "/path/to/001_projects"
 
-projectname=$"project_1"
+projectname=$"relative_file_paths"
 
 
 echo "Making new project called $projectname in:"
 pwd
 
 #script to set up new project on laptop and new git repo that is linked to github
+cd "/path/to/001_projects"
+
 mkdir $projectname
 cd $projectname
 
@@ -62,14 +73,14 @@ mkdir environment
 
 # make environment for sourcing file paths in bash and R
 cd ../
-echo "LOCLA='$PWD'" > $projectname/environment/environment.sh
-echo "LOCAL='$PWD'" > $projectname/.Renvironment
+echo "LOCAL="$PWD"" > $projectname/environment/environment.sh
+echo "LOCAL="$PWD"" > $projectname/.Renviron
 cd $projectname
 
-(
-## general list of file extensions that could contain data
 
-# common data file formats
+# make .gitignore
+## general list of file extensions that could contain data
+(
 echo *.csv
 echo *.tsv
 echo *.dta
@@ -84,11 +95,9 @@ echo .RData
 echo .Ruserdata
 echo *.Rproj
 echo *.Rmd
-
 # genetic data file formats
 echo *.bgen
 echo *.gen
-
 # files generated from BlueCrystal jobs
 echo out*
 echo error*
@@ -96,32 +105,22 @@ echo j*.sh.e*
 echo j*.sh.o*
 echo *.sh.e*
 echo *.sh.o*
-
 # UK Biobank data file formats
 echo *.enc_ukb
 echo *.enc
 echo *.cwa
-
 # common directories
 echo manuscript
 echo data
 echo analysis
 echo environment
-echo run_scripts
-echo output
-
-# config file
-echo config_$projectname
-
 ) > .gitignore
 
-
-# STOP - before you do this bit make sure you have set up a repo of the same project name on GitHub
 touch README.Rmd
-touch config_$projectname
 git init
+git add .gitignore scripts/
 git commit -m "first commit"
-git remote add origin https://github.com/mattlee821/$projectname.git
+git remote add origin https://github.com/YOUR_GITHUB_USERNAME/$projectname.git
 git push -u origin master
 
 echo "Finished"
@@ -131,7 +130,9 @@ echo "Finished"
 
 </details>
 
-<br> I then make a new RStudio project and assign it to this existing
+<br>
+
+I then make a new RStudio project and assign it to this existing
 directory by selecting `File > New Project > Existing Directory >
 Browse` and then selecting the recently made project directory.
 
@@ -161,7 +162,7 @@ setwd(LOCAL)
 # make text file of some data and save it in data/
 data <- data.frame(a = rnorm(rep(1:100, 100)),
                    b = pnorm(rep(1:100, 100)))
-write.table(data, "how_to_git/data/data_frame.txt", 
+write.table(data, "relative_file_paths/data/data_frame.txt", 
             row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
 ```
 
@@ -174,7 +175,7 @@ LOCAL <- Sys.getenv("LOCAL")
 setwd(LOCAL)
 
 # load data
-data <- read.table("how_to_git/data/data_frame.txt", header = T, sep = "\t")
+data <- read.table("relative_file_paths/data/data_frame.txt", header = T, sep = "\t")
 
 # plot data
 library(ggplot2)
@@ -205,16 +206,16 @@ made this text file available in our `environment/` directory as
 source environment/environment.sh
 
 # set working directory
-cd "$LOCAL/how_to_git"
+cd "$LOCAL/relative_file_paths"
 
 # make folder
-echo "We made this file to show how to use environment variables in bash" > "$LOCAL/how_to_git/bash_file.test"
+echo "We made this file to show how to use environment variables in bash" > "$LOCAL/relative_file_paths/bash_file.test"
 
 # show directory files
-head "$LOCAL/how_to_git/bash_file.test"
+head "$LOCAL/relative_file_paths/bash_file.test"
 ```
 
     ## We made this file to show how to use environment variables in bash
 
-You can see that heading the file shows that it has been made in the
-right location.
+You can see that heading the file shows that it has been made. And the
+fact it’s been made means it is in the right location.
